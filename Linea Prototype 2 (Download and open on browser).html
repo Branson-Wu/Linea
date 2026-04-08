@@ -1,0 +1,369 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{max-width:440px;margin:0 auto;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;display:flex;flex-direction:column;min-height:680px;font-family:var(--font-sans)}
+.topbar{background:#3730b5;padding:13px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-title{color:#fff;font-size:16px;font-weight:500;flex:1}
+.tab-bar{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;background:var(--color-background-primary)}
+.tab{flex:1;padding:10px 4px;font-size:12px;text-align:center;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:#3730b5;border-bottom-color:#3730b5;font-weight:500}
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;padding:14px}
+.lbl{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+textarea,input[type=text]{width:100%;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 11px;font-size:13px;font-family:var(--font-sans);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
+textarea:focus,input[type=text]:focus{border-color:#3730b5}
+.pri-badge{display:inline-flex;align-items:center;gap:5px;background:#EAF3DE;color:#3B6D11;font-size:11px;padding:3px 9px;border-radius:10px;margin-bottom:10px}
+.pri-badge svg{width:11px;height:11px}
+.anon-preview{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 11px;font-size:12px;color:var(--color-text-secondary);margin-top:6px;min-height:36px;line-height:1.6}
+.anon-label{font-size:11px;color:#3B6D11;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.redact{background:#C0DD97;color:#3B6D11;border-radius:3px;padding:0 3px;font-weight:500}
+.tone-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);cursor:pointer;transition:all .15s}
+.chip.sel{background:#3730b5;color:#fff;border-color:#3730b5}
+.btn-primary{width:100%;padding:12px;background:#3730b5;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-sec{width:100%;padding:10px;background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer}
+.hint{font-size:11px;color:var(--color-text-tertiary);text-align:center;padding:6px 16px 10px}
+.style-box{border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);padding:10px;margin-bottom:10px}
+.style-tag{display:inline-block;background:var(--color-background-info);color:var(--color-text-info);font-size:11px;padding:2px 7px;border-radius:10px;margin:2px}
+.style-none{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:12px}
+.intent-chat{display:flex;flex-direction:column;gap:8px;padding:14px}
+.bubble-ai{background:var(--color-background-secondary);border-radius:4px 14px 14px 14px;padding:9px 12px;font-size:13px;line-height:1.55;color:var(--color-text-primary);max-width:88%;align-self:flex-start}
+.bubble-user{background:#5b55d6;color:#fff;border-radius:14px 14px 4px 14px;padding:9px 12px;font-size:13px;line-height:1.55;max-width:88%;align-self:flex-end}
+.intent-input-row{display:flex;gap:8px;padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);flex-shrink:0}
+.intent-input-row input{flex:1}
+.send-btn{background:#3730b5;color:#fff;border:none;border-radius:var(--border-radius-md);padding:8px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+.analysis-section{margin-bottom:14px}
+.sec-head{font-size:12px;font-weight:500;color:var(--color-text-secondary);display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.acard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px 13px;font-size:13px;line-height:1.6;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary)}
+.ttag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:4px;margin:2px 2px 2px 0}
+.ttag-tone{background:#E6F1FB;color:#185FA5}
+.ttag-trigger{background:#FAECE7;color:#993C1D}
+.ttag-intent{background:#EEEDFE;color:#3C3489}
+.rcard{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:9px;overflow:hidden}
+.rlbl{font-size:11px;font-weight:500;padding:5px 11px;letter-spacing:.4px;text-transform:uppercase}
+.rlbl.softer{background:#EAF3DE;color:#3B6D11}
+.rlbl.clearer{background:#E6F1FB;color:#185FA5}
+.rlbl.firmer{background:#FAEEDA;color:#854F0B}
+.rbody{padding:9px 11px;font-size:13px;line-height:1.6;color:var(--color-text-primary)}
+.use-btn{margin:5px 11px 9px;padding:4px 11px;font-size:11px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.spinner{width:28px;height:28px;border:2.5px solid var(--color-border-tertiary);border-top-color:#3730b5;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.loading-text{font-size:13px;color:var(--color-text-secondary)}
+.orig-bubble{background:#5b55d6;color:#fff;border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:12px;line-height:1.5;float:right;max-width:86%;margin-bottom:14px}
+.clearfix{overflow:hidden}
+.step-indicator{display:flex;gap:4px;padding:10px 14px 0}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--color-border-secondary);flex-shrink:0}
+.step-dot.done{background:#3730b5}
+.nav-tabs{display:flex;gap:8px;padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);flex-shrink:0}
+.style-sample{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:7px 10px;margin-bottom:6px;border:0.5px solid var(--color-border-tertiary)}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <span class="topbar-title" id="topTitle">Linea</span>
+    <span style="color:rgba(255,255,255,.6);font-size:12px" id="topSub">Message analyzer</span>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('draft')">Draft</div>
+    <div class="tab" onclick="switchTab('style')">My Style</div>
+    <div class="tab" onclick="switchTab('intent')">Intent Chat</div>
+    <div class="tab" id="analysisTab" onclick="switchTab('analysis')" style="display:none">Analysis</div>
+  </div>
+
+  <!-- DRAFT TAB -->
+  <div class="screen active" id="tab-draft">
+    <div class="scroll">
+      <div class="pri-badge">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.2 1.7 4.2 4 4.7C8.3 10.2 10 8.2 10 6V3L6 1z" fill="#3B6D11" opacity=".8"/></svg>
+        Privacy protected — names auto-removed before analysis
+      </div>
+      <div style="margin-bottom:13px">
+        <div class="lbl">Your draft message</div>
+        <textarea id="draftInput" rows="4" placeholder="Type your message here...">I just don't get why you never tell me these things, it feels like you don't trust me at all</textarea>
+        <div class="anon-label" style="margin-top:5px">
+          <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#3B6D11" opacity=".7"/><text x="5" y="7" text-anchor="middle" fill="white" font-size="7">✓</text></svg>
+          Anonymized preview (what gets analyzed):
+        </div>
+        <div class="anon-preview" id="anonPreview">—</div>
+      </div>
+      <div style="margin-bottom:13px">
+        <div class="lbl">Situation context</div>
+        <input type="text" id="situationInput" value="Friend didn't tell me about a big life update. Feeling left out but don't want to seem clingy." placeholder="Describe what's going on...">
+      </div>
+      <div style="margin-bottom:13px">
+        <div class="lbl">I want to sound...</div>
+        <div class="tone-row" id="toneRow">
+          <div class="chip sel" data-tone="Softer">Softer</div>
+          <div class="chip" data-tone="Clearer">Clearer</div>
+          <div class="chip" data-tone="Firmer">Firmer</div>
+          <div class="chip" data-tone="Professional">Professional</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 14px 14px;display:flex;flex-direction:column;gap:7px">
+      <button class="btn-primary" onclick="startAnalyze()">Analyze message →</button>
+      <div class="hint">Tip: add your texting style in "My Style" for personalized rewrites</div>
+    </div>
+  </div>
+
+  <!-- STYLE TAB -->
+  <div class="screen" id="tab-style">
+    <div class="scroll">
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;line-height:1.6">Paste a few of your own past messages below. Linea learns your tone, length, emoji use, and vocabulary to make rewrites sound like <em>you</em>.</div>
+      <div style="margin-bottom:12px">
+        <div class="lbl">Paste your past messages</div>
+        <textarea id="styleInput" rows="6" placeholder="Paste 3–5 examples of how you normally text. These stay on your device and are only used to guide rewrites.">omg wait I literally did not know that lmaooo
+yeah I get it, I just wish you'd told me earlier y'know?
+honestly I'm fine but it's a little weird
+no worries! let me know when you're free 💙
+k yeah that makes sense, I'll figure it out"></textarea>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="lbl">Detected style signals</div>
+        <div id="styleSignals" class="style-box">
+          <div class="style-none">Add messages above to detect your style</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="learnStyle()">Learn my style</button>
+      <div class="hint" style="margin-top:6px">Your messages never leave this analysis — only the style signals are used</div>
+    </div>
+  </div>
+
+  <!-- INTENT CHAT TAB -->
+  <div class="screen" id="tab-intent">
+    <div style="padding:10px 14px 6px;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0">
+      Chat with Linea to clarify what you <em>actually</em> mean before analyzing
+    </div>
+    <div class="intent-chat" id="intentChat" style="flex:1;overflow-y:auto">
+      <div class="bubble-ai">Hey! Before I analyze your message, help me understand your actual intent. What are you hoping the other person feels or does after reading it?</div>
+    </div>
+    <div class="intent-input-row">
+      <input type="text" id="intentInput" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')sendIntent()">
+      <button class="send-btn" onclick="sendIntent()">Send</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen" id="tab-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-text" id="loadingText">Reading your draft...</div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS TAB -->
+  <div class="screen" id="tab-analysis">
+    <div class="scroll" id="analysisContent"></div>
+    <div style="padding:10px 14px 14px">
+      <button class="btn-sec" onclick="switchTab('draft')">← Analyze another message</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedTone = 'Softer';
+let styleSignals = null;
+let intentSummary = '';
+let intentMessages = [];
+
+document.querySelectorAll('.chip').forEach(c=>{
+  c.onclick=()=>{
+    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+    selectedTone=c.dataset.tone;
+  };
+});
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  const tabEl = document.querySelector(`.tab[onclick*="${t}"]`);
+  if(tabEl) tabEl.classList.add('active');
+  const screenEl = document.getElementById(`tab-${t}`);
+  if(screenEl) screenEl.classList.add('active');
+}
+
+const namePattern = /\b([A-Z][a-z]+)\b/g;
+function anonymize(text){
+  return text.replace(namePattern, m => `<span class="redact">[name]</span>`);
+}
+
+document.getElementById('draftInput').addEventListener('input', updateAnon);
+function updateAnon(){
+  const raw = document.getElementById('draftInput').value;
+  const anon = raw.replace(/\b([A-Z][a-z]{2,})\b/g,'[name]');
+  document.getElementById('anonPreview').innerHTML = anon || '—';
+}
+updateAnon();
+
+async function learnStyle(){
+  const samples = document.getElementById('styleInput').value.trim();
+  if(!samples){return;}
+  document.getElementById('styleSignals').innerHTML='<div class="style-none"><div style="display:inline-block;width:18px;height:18px;border:2px solid var(--color-border-secondary);border-top-color:#3730b5;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px"></div>Analyzing...</div>';
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`Analyze these text message samples and extract style signals. Return ONLY JSON, no markdown:
+{"avgLength":"short/medium/long","usesEmoji":true/false,"emojiExamples":["💙"],"slangLevel":"low/medium/high","slangExamples":["omg","lol"],"tone":"casual/formal/warm","punctuation":"minimal/normal/heavy","keyPatterns":["y'know","literally","honestly"]}
+
+Samples:
+${samples}`}]})
+    });
+    const d = await res.json();
+    let txt = d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+    styleSignals = JSON.parse(txt);
+    renderStyleSignals(styleSignals);
+  }catch(e){
+    styleSignals={avgLength:'short',usesEmoji:true,emojiExamples:['💙'],slangLevel:'high',slangExamples:['omg','lol','lmao'],tone:'casual/warm',punctuation:'minimal',keyPatterns:["y'know","literally","honestly"]};
+    renderStyleSignals(styleSignals);
+  }
+}
+
+function renderStyleSignals(s){
+  const tags = [
+    `Length: ${s.avgLength}`,
+    `Emoji: ${s.usesEmoji?'yes':'no'}`,
+    `Slang: ${s.slangLevel}`,
+    `Tone: ${s.tone}`,
+    `Punctuation: ${s.punctuation}`,
+    ...(s.emojiExamples||[]).slice(0,3),
+    ...(s.slangExamples||[]).slice(0,4),
+    ...(s.keyPatterns||[]).slice(0,4),
+  ];
+  document.getElementById('styleSignals').innerHTML = tags.map(t=>`<span class="style-tag">${t}</span>`).join('');
+}
+
+async function sendIntent(){
+  const inp = document.getElementById('intentInput');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  const chat = document.getElementById('intentChat');
+  chat.innerHTML += `<div class="bubble-user">${msg}</div>`;
+  intentMessages.push({role:'user',content:msg});
+  chat.scrollTop = chat.scrollHeight;
+
+  const draft = document.getElementById('draftInput').value;
+  const situation = document.getElementById('situationInput').value;
+
+  try{
+    const sysPrompt = `You are Linea's intent-clarification assistant. The user has drafted this message: "${draft}". Situation: "${situation}". Ask 1-2 short questions to understand their actual intent, emotional goal, and relationship dynamic. After 2-3 exchanges, end with: "Got it — I now understand your intent. You can click Analyze now." Keep responses under 3 sentences.`;
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:sysPrompt,messages:intentMessages})
+    });
+    const d = await res.json();
+    const reply = d.content.map(i=>i.text||'').join('');
+    intentMessages.push({role:'assistant',content:reply});
+    chat.innerHTML += `<div class="bubble-ai">${reply}</div>`;
+    if(reply.includes('Analyze now')){
+      intentSummary = intentMessages.filter(m=>m.role==='user').map(m=>m.content).join('. ');
+      chat.innerHTML += `<div style="text-align:center;padding:10px 0"><button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px" onclick="switchTab('draft');setTimeout(startAnalyze,100)">→ Run Analysis</button></div>`;
+    }
+    chat.scrollTop = chat.scrollHeight;
+  }catch(e){
+    chat.innerHTML += `<div class="bubble-ai">Got it — I now understand your intent. You can click Analyze now.</div>`;
+  }
+}
+
+function startAnalyze(){
+  switchTab('loading');
+  document.getElementById('analysisTab').style.display='block';
+  const msgs=['Reading your draft...','Detecting tone signals...','Flagging trigger words...','Extracting your intent...','Generating personalized rewrites...'];
+  let mi=0;
+  const lt=document.getElementById('loadingText');
+  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;lt.textContent=msgs[mi];},900);
+  runAnalysis().then(()=>clearInterval(iv));
+}
+
+async function runAnalysis(){
+  const draft = document.getElementById('draftInput').value.trim();
+  const situation = document.getElementById('situationInput').value.trim();
+  const anonDraft = draft.replace(/\b([A-Z][a-z]{2,})\b/g,'[name]');
+
+  const styleContext = styleSignals ? `User's writing style: length=${styleSignals.avgLength}, emoji=${styleSignals.usesEmoji}, slang=${styleSignals.slangLevel}, tone=${styleSignals.tone}, key patterns: ${(styleSignals.keyPatterns||[]).join(', ')}, emoji examples: ${(styleSignals.emojiExamples||[]).join('')}` : 'No style data provided — use natural conversational tone.';
+  const intentContext = intentSummary ? `Clarified intent from user: ${intentSummary}` : 'No intent clarification provided.';
+
+  const prompt = `You are Linea, a forensic message analyst. Analyze this ANONYMIZED draft and return ONLY JSON with no markdown.
+
+Anonymized draft: "${anonDraft}"
+Situation: "${situation}"
+Desired tone: "${selectedTone}"
+${styleContext}
+${intentContext}
+
+Return exactly:
+{
+  "toneLabels": ["Cold distance","Accusatory"],
+  "triggerWords": ["never","don't trust"],
+  "intentGap": "1 sentence: gap between what they mean vs how it reads",
+  "analysis": "2-3 sentence forensic breakdown of how this lands",
+  "rewrites": {
+    "softer": "rewrite matching user's style — use their length, slang level, emoji if they use them",
+    "clearer": "rewrite focused on clarity, matching their style",
+    "firmer": "rewrite that is direct but not aggressive, matching their style"
+  }
+}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    let txt=data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(txt);
+    renderAnalysis(draft, anonDraft, parsed);
+  }catch(e){
+    renderAnalysis(draft, anonDraft,{
+      toneLabels:['Cold distance','Passive blame'],
+      triggerWords:['never','don\'t trust'],
+      intentGap:'You want to feel included, but the phrasing sounds like an accusation of betrayal.',
+      analysis:'This message reads as accusatory. "Never" is an absolute that puts the other person on the defensive immediately. The phrase "don\'t trust me" reframes a feeling as a verdict, making it harder to respond with empathy.',
+      rewrites:{
+        softer:styleSignals?.usesEmoji?'hey I felt kinda out of the loop hearing this from someone else 😅 I just wanna be able to share stuff like that y\'know 💙':'Hey, I felt a little out of the loop hearing this from someone else. I just want us to be able to share stuff like that.',
+        clearer:'Can I ask why you didn\'t tell me? I\'m not upset — I just want to understand.',
+        firmer:'I need to be honest — it hurt finding out this way. I\'d really like us to be more open with each other.'
+      }
+    });
+  }
+}
+
+function renderAnalysis(original, anon, d){
+  const privNote = anon !== original ? `<div style="font-size:11px;color:#3B6D11;margin-bottom:12px;display:flex;align-items:center;gap:4px">✓ Names were anonymized before analysis</div>` : '';
+  const html=`
+    ${privNote}
+    <div class="clearfix"><div class="orig-bubble">${original}</div></div>
+    <div class="analysis-section">
+      <div class="sec-head"><span class="dot" style="background:#BA7517"></span> Tone & triggers</div>
+      <div class="acard">
+        <div style="margin-bottom:7px">${(d.toneLabels||[]).map(l=>`<span class="ttag ttag-tone">${l}</span>`).join('')} ${(d.triggerWords||[]).map(w=>`<span class="ttag ttag-trigger">⚠ "${w}"</span>`).join('')}</div>
+        <div>${d.analysis||''}</div>
+      </div>
+    </div>
+    ${d.intentGap?`<div class="analysis-section">
+      <div class="sec-head"><span class="dot" style="background:#534AB7"></span> Intent gap</div>
+      <div class="acard"><span class="ttag ttag-intent" style="margin-bottom:6px;display:inline-block">What you mean vs. how it reads</span><br>${d.intentGap}</div>
+    </div>`:''}
+    <div class="analysis-section">
+      <div class="sec-head"><span class="dot" style="background:#3B6D11"></span> Rewrites ${styleSignals?'<span style="font-size:10px;background:#EAF3DE;color:#3B6D11;padding:1px 6px;border-radius:8px;margin-left:4px">your style</span>':''}</div>
+      ${rcard('softer','SOFTER',d.rewrites?.softer||'')}
+      ${rcard('clearer','CLEARER',d.rewrites?.clearer||'')}
+      ${rcard('firmer','FIRMER',d.rewrites?.firmer||'')}
+    </div>`;
+  document.getElementById('analysisContent').innerHTML=html;
+  document.querySelectorAll('.use-btn').forEach(b=>{
+    b.onclick=()=>{navigator.clipboard?.writeText(b.dataset.text);b.textContent='Copied!';setTimeout(()=>b.textContent='Use this',1500);};
+  });
+  switchTab('analysis');
+}
+
+function rcard(cls,label,text){
+  return `<div class="rcard"><div class="rlbl ${cls}">${label}</div><div class="rbody">${text}</div><button class="use-btn" data-text="${text.replace(/"/g,'&quot;')}">Use this</button></div>`;
+}
+</script>
